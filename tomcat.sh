@@ -1,30 +1,29 @@
-sudo -i
-sudo apt update && sudo apt upgrade -y
+#!/bin/bash
+
 sudo apt update
+sudo apt upgrade -y
+sudo apt install openjdk-17-jre-headless -y
 
-sudo wget https://dlcdn.apache.org/tomcat/tomcat-10/v10.1.26/bin/apache-tomcat-10.1.26.tar.gz -P /opt
+cd /opt || exit 1
 
-cd /opt
-
-sudo tar -zxvf apache-tomcat-10.1.26.tar.gz
-sudo mv apache-tomcat-10.1.26 tomcat
-sudo rm -rf apache-tomcat-10.1.26.tar.gz
+sudo wget https://dlcdn.apache.org/tomcat/tomcat-9/v9.0.93/bin/apache-tomcat-9.0.93.tar.gz
+sudo tar -zxvf apache-tomcat-9.0.93.tar.gz
+sudo mv apache-tomcat-9.0.93 tomcat
 
 sudo useradd -m -U -d /opt/tomcat -s /bin/false tomcat
 sudo chown -R tomcat: /opt/tomcat
-sudo sh -c 'chmod +x /opt/tomcat/bin/*.sh'
+sudo chmod +x /opt/tomcat/bin/*.sh
 
-git clone https://github.com/bandakarthikreddy/configuration-files.git
+# Adding the git clone step here, assuming it's needed after the Tomcat setup
+sudo git clone https://github.com/bandakarthikreddy/configuration-files.git
 
-sudo mv tomcat.service /etc/systemd/system/tomcat.service
-sudo cp -r content.xml /opt/tomcat/webapps/manager/META-INF/
-sudo cp -r content.xml /opt/tomcat/webapps/host-manager/META-INF/
-sudo cp -r tomcat-users.xml /opt/tomcat/conf/
+sudo mv /opt/configuration-files/tomcat-users.xml /opt/tomcat/conf/
+sudo cp -r /opt/configuration-files/context.xml /opt/tomcat/webapps/manager/META-INF/
+sudo cp -r /opt/configuration-files/context.xml /opt/tomcat/webapps/host-manager/META-INF/
+sudo cp -r /opt/configuration-files/tomcat.service /etc/systemd/system/
 
-java --version
-JAVA_HOME="/usr/lib/jvm/java-17-openjdk-amd64/"
-echo $JAVA_HOME
+
 sudo systemctl daemon-reload
-systemctl enable tomcat
-systemctl restart tomcat
-systemctl status tomcat
+sudo systemctl enable tomcat
+sudo systemctl restart tomcat
+sudo systemctl status tomcat
